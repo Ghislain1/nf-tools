@@ -4,37 +4,42 @@
 ////
 
 using LiveCharts;
+using LiveCharts.Configurations;
 using LiveCharts.Wpf;
+using nanoFramework.Tools.NanoProfiler.Models;
 using System.ComponentModel;
 
-namespace nanoFramework.Tools.NanoProfiler.Views.Controls
+namespace nanoFramework.Tools.NanoProfiler.Views.Controls;
+
+public partial class HistogramTooltip : IChartTooltip
 {
-    public partial class HistogramTooltip : IChartTooltip
+    private TooltipData? _data;
+    public HistogramTooltip()
     {
-        private TooltipData _data;
-        public HistogramTooltip()
-        {
-            InitializeComponent();
-            DataContext = this;
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
+        InitializeComponent();
+        //let create a mapper so LiveCharts know how to plot our CustomerViewModel class
+        var customerVmMapper = Mappers.Xy<TypeDesc>()
+            .X((value, index) => index) // lets use the position of the item as X
+            .Y(value => value.count); //and PurchasedItems property as Y
 
-        public TooltipData Data
-        {
-            get { return _data; }
-            set
-            {
-                _data = value;
-                OnPropertyChanged("Data");
-            }
-        }
+        //lets save the mapper globally
+        Charting.For<TypeDesc>(customerVmMapper);
 
-        public TooltipSelectionMode? SelectionMode { get; set; }
+        DataContext = this;
+    }
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string propertyName = null)
+    public TooltipData? Data
+    {
+        get { return _data; }
+        set
         {
-            if (PropertyChanged != null)
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            _data = value;
+            OnPropertyChanged("Data");
         }
     }
+
+    public TooltipSelectionMode? SelectionMode { get; set; }
+
+    protected virtual void OnPropertyChanged(string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

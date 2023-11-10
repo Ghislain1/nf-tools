@@ -68,6 +68,7 @@
                 <Grid Grid.Row="1" Grid.Column="0" >
                     <lvc:CartesianChart Name="cartesianChart0" Margin="10" 
                                     DataClickCommand="{Binding DrillDownCommand}"
+                                        LegendLocation="Top"
                                     Series="{Binding SeriesCollection}" Hoverable="False" 
                                     >
                         <lvc:CartesianChart.DataTooltip>
